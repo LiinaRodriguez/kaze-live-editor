@@ -1,12 +1,24 @@
 import Visualization from './components/visualization'
- 
-export default function App() {
+import './App.css';
+import Editor from './components/editor';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import './App.css';
+
+function App() {
   return (
-    <div style={{ display: 'flex', width: '100vw', height: '100vh' }}>
-      <div style={{ width: '50%', borderRight: '1px solid #ccc' }}>Editor</div>
-      <div style={{ width: '50%' }}>
-        <Visualization />
+    <div className="app-container">
+      <Editor />
+      <div className="boton-container">
+        <button className="boton-flecha">
+          <FontAwesomeIcon icon={faArrowRight} />
+        </button>
+      </div>
+      <div className="diagram-component">
+      <Visualization />
       </div>
     </div>
   );
 }
+
+export default App;

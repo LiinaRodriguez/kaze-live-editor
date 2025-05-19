@@ -1,3 +1,5 @@
+import Visualization from './components/visualization'
+import './App.css';
 import Editor from './components/editor';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
@@ -13,7 +15,7 @@ function App() {
         </button>
       </div>
       <div className="diagram-component">
-        <h1>Hola mundo</h1>
+      <Visualization />
       </div>
     </div>
   );

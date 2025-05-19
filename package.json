@@ -10,8 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@xyflow/react": "^12.6.3",
-    "kaze": "github:liinarodriguez/kaze#main",
+    "@liinarodriguez/kaze": "^1.0.3",
+    "@xyflow/react": "^12.6.4",
+    "kaze-live-editor": "file:",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

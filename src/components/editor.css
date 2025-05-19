@@ -1,0 +1,27 @@
+.editor-component {
+  flex: 1;
+  position: relative;
+  border-radius: 5%;
+  margin: 2rem;
+}
+
+.cm-editor {
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.cm-scroller {
+  overflow: auto;
+}
+.cm-keyword {
+  color: #C586C0; /* púrpura */
+  font-weight: bold;
+}
+
+.cm-string {
+  color: #6A9955; /* verde */
+}

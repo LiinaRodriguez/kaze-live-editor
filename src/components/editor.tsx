@@ -4,7 +4,7 @@ import { EditorView, keymap, highlightActiveLine } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { customLanguage } from './customLanguage';
-import './Editor.css';
+import './editor.css';
 
 function Editor() {
   const editorRef = useRef<HTMLDivElement>(null);

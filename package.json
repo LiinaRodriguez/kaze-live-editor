@@ -10,11 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "@liinarodriguez/kaze": "^1.0.3",
-    "@xyflow/react": "^12.6.4",
-    "kaze-live-editor": "file:",
-=======
     "@codemirror/commands": "^6.8.1",
     "@codemirror/language": "^6.11.0",
     "@codemirror/language-data": "^6.5.1",
@@ -26,9 +21,10 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@lezer/highlight": "^1.2.1",
     "@lezer/javascript": "^1.5.1",
+    "@liinarodriguez/kaze": "^1.0.3",
     "@xyflow/react": "^12.6.3",
     "kaze": "github:liinarodriguez/kaze#main",
->>>>>>> main
+    "kaze-live-editor": "file:",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

@@ -6,10 +6,14 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { customLanguage } from './customLanguage';
 import './editor.css';
 
-function Editor() {
+type Props = {
+  content: string,
+  onSetContent:(value: string) => void
+}
+
+function Editor({ content, onSetContent}:Props) {
   const editorRef = useRef<HTMLDivElement>(null);
   const editorInstance = useRef<EditorView | null>(null);
-  const [contenido, setContenido] = useState(''); // contenido actual
 
   useEffect(() => {
     if (!editorRef.current) return;
@@ -22,8 +26,8 @@ function Editor() {
     const updateListener = EditorView.updateListener.of((update) => {
       if (update.docChanged) {
         const currentText = update.state.doc.toString();
-        setContenido(currentText); // almacena en estado
-        console.log('Contenido actualizado:', currentText); // opcional
+        onSetContent(currentText); // almacena en estado
+        
       }
     });
 

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -10,15 +10,34 @@ import {
 } from '@xyflow/react';
 
 import { parseToReactFlow } from '@liinarodriguez/kaze';
-import { kazeFile } from '../data/test.kaze';
-
 import '@xyflow/react/dist/style.css';
 
-const { nodes: initialNodes, edges: initialEdges } = parseToReactFlow(kazeFile);
+type Props = {
+  content: string,
+}
 
-export default function Visualization() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+export default function Visualization({ content }: Props) {
+  
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+  useEffect(() => {
+    try {
+      if (content) { 
+        const parsed = parseToReactFlow(content);
+       
+        setNodes(parsed.nodes ); 
+        setEdges(parsed.edges );
+      } else { // Limpiar si el contenido está vacío
+        setNodes([]);
+        setEdges([]);
+      }
+    } catch (error) {
+      console.error('Error al parsear contenido:', error);
+      setNodes([]); 
+      setEdges([]); 
+    }
+  }, [content, setNodes, setEdges]); 
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),

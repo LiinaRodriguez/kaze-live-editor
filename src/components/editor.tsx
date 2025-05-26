@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { EditorState } from '@codemirror/state';
 import { EditorView, keymap, highlightActiveLine } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
@@ -7,11 +7,11 @@ import { customLanguage } from './customLanguage';
 import './editor.css';
 
 type Props = {
-  content: string,
-  onSetContent:(value: string) => void
-}
+  content: string;
+  onSetContent: (value: string) => void;
+};
 
-function Editor({ content, onSetContent}:Props) {
+function Editor({ content, onSetContent }: Props) {
   const editorRef = useRef<HTMLDivElement>(null);
   const editorInstance = useRef<EditorView | null>(null);
 
@@ -26,36 +26,30 @@ function Editor({ content, onSetContent}:Props) {
     const updateListener = EditorView.updateListener.of((update) => {
       if (update.docChanged) {
         const currentText = update.state.doc.toString();
-        onSetContent(currentText); // almacena en estado
-        
+        onSetContent(currentText);
       }
     });
 
-    try {
-      const state = EditorState.create({
-        doc: `//Escribe tu codigo aqui
-`,
-        extensions: [
-          history(),
-          keymap.of([...defaultKeymap, ...historyKeymap]),
-          highlightActiveLine(),
-          oneDark,
-          ...customLanguage(),
-          updateListener, // ✅ escucha cambios
-          EditorView.theme({
-            "&": { height: "100%" },
-            ".cm-content": { padding: "10px 0" }
-          })
-        ]
-      });
+    const state = EditorState.create({
+      doc: content || '//Escribe tu codigo aqui\n',
+      extensions: [
+        history(),
+        keymap.of([...defaultKeymap, ...historyKeymap]),
+        highlightActiveLine(),
+        oneDark,
+        ...customLanguage(),
+        updateListener,
+        EditorView.theme({
+          "&": { height: "100%" },
+          ".cm-content": { padding: "10px 0" }
+        })
+      ]
+    });
 
-      editorInstance.current = new EditorView({
-        state,
-        parent: editorRef.current
-      });
-    } catch (error) {
-      console.error('Error inicializando CodeMirror:', error);
-    }
+    editorInstance.current = new EditorView({
+      state,
+      parent: editorRef.current
+    });
 
     return () => {
       if (editorInstance.current) {
@@ -63,7 +57,7 @@ function Editor({ content, onSetContent}:Props) {
         editorInstance.current = null;
       }
     };
-  }, []);
+  }, [content]);
 
   return <div className="editor-component" ref={editorRef}></div>;
 }

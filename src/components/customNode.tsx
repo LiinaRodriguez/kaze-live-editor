@@ -30,7 +30,7 @@ function CustomNode({ data }: { data: CustomNodeData }) {
       <Handle type="target" position={Position.Top} />
       <div>{data.label}</div> {/* Manejar etiqueta undefined */}
       <Handle type="source" position={Position.Bottom} />
-   
+
     </div>
   );
 }

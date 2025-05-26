@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CustomNode from './customNode';
 import {
@@ -14,13 +13,14 @@ import {
   type Node,
   type Edge,
   type Connection,
-  type OnEdgesChange,
-  type OnNodesChange,
+  type NodeChange,
+  type EdgeChange
 } from '@xyflow/react';
 import { parseToReactFlow } from '@liinarodriguez/kaze';
 import { toPng } from 'html-to-image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import toast from 'react-hot-toast';
 import '@xyflow/react/dist/style.css';
 
 type LayoutDirection = 'top-down' | 'left-right' | 'right-left' | 'bottom-up';
@@ -31,70 +31,14 @@ type Props = {
   useCurvedEdges: boolean;
 };
 
-function isValidSyntax(content: string): string | null {
-  try {
-    parseToReactFlow(content); // Intenta parsear el contenido
-    return null; // Si no lanza error, no hay problema
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error('Error de sintaxis detectado:', error);
-      return error.message; // Devuelve el mensaje del error
-    }
-    console.error('Error de sintaxis desconocido:', error);
-    return 'Error desconocido'; // Mensaje genérico para errores desconocidos
-  }
-}
-
 export default function Visualization({ content, layout, useCurvedEdges }: Props) {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
-  const [error, setError] = useState<string | null>(null); // Estado para manejar errores
-  const nodeTypes = useMemo(() => ({
-    custom: CustomNode,
-  }), []);
-
+  const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const parsedContent = useRef<{ nodes: Node[]; edges: Edge[] } | null>(null);
 
-
-  useEffect(() => {
-    try {
-      const syntaxError = isValidSyntax(content);
-      console.log(content)
-      if (content && !syntaxError) {
-        const parsed = parseToReactFlow(content) as { nodes: Node[]; edges: Edge[] };
-        const nodesWithTypes = parsed.nodes.map(node => ({
-          ...node,
-          type: 'custom',
-        }));
-        const positionedNodes = applyLayout(nodesWithTypes, parsed.edges, layout);
-
-        setNodes(positionedNodes);
-
-        const styledEdges = parsed.edges.map((edge) => ({
-          ...edge,
-          type: useCurvedEdges ? 'smoothstep' : 'straight',
-          style: {
-            stroke: '#555',
-            strokeWidth: 2,
-          },
-          // Eliminamos markerEnd para quitar las flechas
-        }));
-        setEdges(styledEdges);
-        setError(null); // Limpia el error si todo está bien
-      } else {
-        setNodes([]);
-        setEdges([]);
-        setError(syntaxError || 'El contenido tiene una sintaxis inválida.'); // Establece un mensaje de error
-      }
-    } catch (error) {
-      console.error('Error al parsear contenido:', error);
-      setNodes([]);
-      setEdges([]);
-      setError('Error al parsear contenido. Verifica la sintaxis.'); // Establece un mensaje de error
-    }
-  }, [content, layout, useCurvedEdges]);
-
-  const applyLayout = (nodes: Node[], edges: Edge[], layout: LayoutDirection): Node[] => {
+  const applyLayout = useCallback((nodes: Node[], edges: Edge[], layout: LayoutDirection): Node[] => {
     const spacingX = 200;
     const spacingY = 120;
     const nodeMap = new Map<string, Node>();
@@ -139,7 +83,6 @@ export default function Visualization({ content, layout, useCurvedEdges }: Props
             break;
         }
       }
-
       return avg;
     };
 
@@ -147,15 +90,83 @@ export default function Visualization({ content, layout, useCurvedEdges }: Props
     const roots = nodes.filter((n) => !targets.has(n.id));
     roots.forEach((r) => positionNode(r.id, 0));
     return Array.from(nodeMap.values());
-  };
+  }, []);
 
-  const onNodesChange: OnNodesChange = useCallback(
-    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
+  useEffect(() => {
+    if (!content) {
+      setNodes([]);
+      setEdges([]);
+      parsedContent.current = null;
+      return;
+    }
+
+    try {
+      const parsed = parseToReactFlow(content);
+
+      if (!parsed || !parsed.nodes || !parsed.edges) {
+        throw new Error('Error al parsear el contenido');
+      }
+
+      const nodesWithTypes = parsed.nodes.map(node => ({
+        ...node,
+        type: 'custom',
+      }));
+
+      if (nodesWithTypes.length > 0) {
+        parsedContent.current = {
+          nodes: nodesWithTypes,
+          edges: parsed.edges
+        };
+
+        const positionedNodes = applyLayout(nodesWithTypes, parsed.edges, layout);
+        setNodes(positionedNodes);
+
+        const styledEdges = parsed.edges.map((edge) => ({
+          ...edge,
+          type: useCurvedEdges ? 'smoothstep' : 'straight',
+          style: { stroke: '#6f6371', strokeWidth: 2 },
+        }));
+        setEdges(styledEdges);
+      } else {
+        throw new Error('No se encontraron nodos en el contenido');
+      }
+    } catch (error) {
+      console.error('Error al procesar el contenido:', error);
+      setNodes([]);
+      setEdges([]);
+      toast.error(error instanceof Error ? error.message : 'Error al procesar el contenido', {
+        duration: 4000,
+        style: {
+          background: '#fee2e2',
+          color: '#dc2626',
+        },
+      });
+      parsedContent.current = null;
+    }
+  }, [content, layout, useCurvedEdges, applyLayout]);
+
+  useEffect(() => {
+    if (parsedContent.current) {
+      const { nodes: currentNodes, edges: currentEdges } = parsedContent.current;
+      const positionedNodes = applyLayout(currentNodes, currentEdges, layout);
+      setNodes(positionedNodes);
+
+      const styledEdges = currentEdges.map((edge) => ({
+        ...edge,
+        type: useCurvedEdges ? 'smoothstep' : 'straight',
+        style: { stroke: '#6f6371', strokeWidth: 2 },
+      }));
+      setEdges(styledEdges);
+    }
+  }, [layout, useCurvedEdges, applyLayout]);
+
+  const onNodesChange = useCallback(
+    (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
     []
   );
 
-  const onEdgesChange: OnEdgesChange = useCallback(
-    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+  const onEdgesChange = useCallback(
+    (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
     []
   );
 
@@ -190,14 +201,28 @@ export default function Visualization({ content, layout, useCurvedEdges }: Props
       link.download = 'diagrama.png';
       link.href = dataUrl;
       link.click();
+
+      toast.success('Imagen exportada correctamente', {
+        duration: 3000,
+        style: {
+          background: '#dcfce7',
+          color: '#166534',
+        },
+      });
     } catch (err) {
       console.error('Error al exportar imagen:', err);
+      toast.error('Error al exportar la imagen', {
+        duration: 4000,
+        style: {
+          background: '#fee2e2',
+          color: '#dc2626',
+        },
+      });
     }
   };
 
   return (
-    <>
-      <div
+    <div
       className="visualization-wrapper"
       style={{
         position: 'relative',
@@ -206,8 +231,7 @@ export default function Visualization({ content, layout, useCurvedEdges }: Props
         backgroundColor: 'white',
       }}
       ref={reactFlowWrapper}
-      >
-       
+    >
       <button
         className="download-btn"
         style={{
@@ -226,7 +250,6 @@ export default function Visualization({ content, layout, useCurvedEdges }: Props
         <FontAwesomeIcon icon={faDownload} />
       </button>
 
-
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -235,16 +258,12 @@ export default function Visualization({ content, layout, useCurvedEdges }: Props
         onConnect={onConnect}
         fitView
         nodeTypes={nodeTypes}
-        style={{ backgroundColor: 'white' }}
+        style={{ backgroundColor: '#a5afbd33' }}
       >
         <Controls className="react-flow__controls" />
         <MiniMap />
-        <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-        </ReactFlow>
-        <div style={{ width: '100vw', height: '100vh', overflow: 'auto' }}>
-           {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
-        </div>
-      </div>
-      </>
+        <Background variant={BackgroundVariant.Dots} gap={12} size={1} color="#6f6371" />
+      </ReactFlow>
+    </div>
   );
 }

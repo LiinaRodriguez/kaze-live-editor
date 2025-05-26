@@ -17,16 +17,18 @@
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.36.8",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@lezer/highlight": "^1.2.1",
     "@lezer/javascript": "^1.5.1",
-    "@liinarodriguez/kaze": "^1.2.0",
+    "@liinarodriguez/kaze": "^1.2.2",
     "@xyflow/react": "^12.6.3",
     "html-to-image": "^1.11.13",
     "kaze-live-editor": "file:",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-hot-toast": "^2.5.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

@@ -5,7 +5,6 @@ body, html, #root {
 
 .header{
   height: 80px;
-  width: 100%;
   position: relative;
   display: flex;
   flex-direction: row;

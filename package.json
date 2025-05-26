@@ -21,7 +21,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@lezer/highlight": "^1.2.1",
     "@lezer/javascript": "^1.5.1",
-    "@liinarodriguez/kaze": "^1.0.3",
+    "@liinarodriguez/kaze": "^1.2.0",
     "@xyflow/react": "^12.6.3",
     "kaze": "github:liinarodriguez/kaze#main",
     "kaze-live-editor": "file:",

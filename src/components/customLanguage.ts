@@ -14,7 +14,7 @@ export const customLanguage = () => [
         return 'string';
       }
 
-      if (stream.match(/[{}\[\]:,]/)) {
+      if (stream.match(/[{}[\]:,]/)) {
         return 'bracket';
       }
 

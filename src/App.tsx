@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import Visualization from './components/visualization';
-import './App.css';
 import Editor from './components/editor';
+import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { kazeFile } from './data/test.kaze';
 
 function App() {
   const [content, setContent] = useState('');
@@ -15,9 +16,17 @@ function App() {
     setVisualContent(content);
   };
 
+  const handleExampleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selected = e.target.value;
+    if (selected === 'example1') {
+      setContent(kazeFile);
+    }
+  };
+
   return (
     <div className="main-container">
       <h1>KAZE</h1>
+
       <div className="customization">
         <h2>Personalización</h2>
         <div className="customization-options">
@@ -39,8 +48,16 @@ function App() {
       </div>
 
       <div className="app-container">
-        <div className="editor-container">
-          <Editor content={content} onSetContent={setContent} />
+        <div className="editor-wrapper">
+          <div className="editor-selector">
+            <select onChange={handleExampleChange}>
+              <option value="">Seleccionar ejemplo</option>
+              <option value="example1">Ejemplo 1</option>
+            </select>
+          </div>
+          <div className="editor-container">
+            <Editor content={content} onSetContent={setContent} />
+          </div>
         </div>
 
         <div className="translate-button">

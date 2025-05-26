@@ -23,6 +23,7 @@
     "@lezer/javascript": "^1.5.1",
     "@liinarodriguez/kaze": "^1.0.3",
     "@xyflow/react": "^12.6.3",
+    "html-to-image": "^1.11.13",
     "kaze": "github:liinarodriguez/kaze#main",
     "kaze-live-editor": "file:",
     "react": "^19.1.0",

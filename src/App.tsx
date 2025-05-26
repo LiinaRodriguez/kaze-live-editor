@@ -5,6 +5,7 @@ import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { kazeFile } from './data/test.kaze';
+import Header from './components/header';
 
 function App() {
   const [content, setContent] = useState('');
@@ -25,12 +26,11 @@ function App() {
 
   return (
     <div className="main-container">
-      <h1>KAZE</h1>
-
+      <Header/>
       <div className="customization">
         <h2>Personalización</h2>
         <div className="customization-options">
-          <select onChange={(e) => setLayout(e.target.value as any)} value={layout}>
+          <select onChange={(e) => setLayout(e.target.value as 'top-down' | 'left-right' | 'right-left' | 'bottom-up')} value={layout}>
             <option value="top-down">Arriba-Abajo</option>
             <option value="left-right">Izquierda-Derecha</option>
             <option value="right-left">Derecha-Izquierda</option>

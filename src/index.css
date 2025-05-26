@@ -2,3 +2,41 @@ body, html, #root {
   height: 100%;
   margin: 0;
 }
+
+.header{
+  height: 80px;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #a5afbd;
+}
+
+.header a{
+  text-decoration: none;
+  color: black;
+}
+
+.header  a:hover{
+ color:#b01d0b
+}
+.links{
+  display: flex;
+  flex-direction: row;
+}
+
+.link-item{
+  list-style: none;
+  padding-right: 12%;
+}
+
+.link-item a{
+  text-decoration: none;
+  color: black;
+}
+
+.link-item a:hover{
+  color:royalblue;
+}

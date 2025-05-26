@@ -1,7 +1,6 @@
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CustomNode from './customNode';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ReactFlow,
   MiniMap,
@@ -36,9 +35,13 @@ function isValidSyntax(content: string): string | null {
   try {
     parseToReactFlow(content); // Intenta parsear el contenido
     return null; // Si no lanza error, no hay problema
-  } catch (error: any) {
-    console.error('Error de sintaxis detectado:', error);
-    return error.message; // Devuelve el mensaje del error
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('Error de sintaxis detectado:', error);
+      return error.message; // Devuelve el mensaje del error
+    }
+    console.error('Error de sintaxis desconocido:', error);
+    return 'Error desconocido'; // Mensaje genérico para errores desconocidos
   }
 }
 
@@ -193,11 +196,8 @@ export default function Visualization({ content, layout, useCurvedEdges }: Props
   };
 
   return (
-
-    <div style={{ width: '100vw', height: '100vh', overflow: 'auto' }}>
-      {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>} {/* Muestra el error */}
-
-    <div
+    <>
+      <div
       className="visualization-wrapper"
       style={{
         position: 'relative',
@@ -206,7 +206,8 @@ export default function Visualization({ content, layout, useCurvedEdges }: Props
         backgroundColor: 'white',
       }}
       ref={reactFlowWrapper}
-    >
+      >
+       
       <button
         className="download-btn"
         style={{
@@ -239,7 +240,11 @@ export default function Visualization({ content, layout, useCurvedEdges }: Props
         <Controls className="react-flow__controls" />
         <MiniMap />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
-      </ReactFlow>
-    </div>
+        </ReactFlow>
+        <div style={{ width: '100vw', height: '100vh', overflow: 'auto' }}>
+           {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+        </div>
+      </div>
+      </>
   );
 }

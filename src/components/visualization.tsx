@@ -1,3 +1,6 @@
+
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import CustomNode from './customNode';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ReactFlow,
@@ -29,16 +32,39 @@ type Props = {
   useCurvedEdges: boolean;
 };
 
+function isValidSyntax(content: string): string | null {
+  try {
+    parseToReactFlow(content); // Intenta parsear el contenido
+    return null; // Si no lanza error, no hay problema
+  } catch (error: any) {
+    console.error('Error de sintaxis detectado:', error);
+    return error.message; // Devuelve el mensaje del error
+  }
+}
+
 export default function Visualization({ content, layout, useCurvedEdges }: Props) {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+  const [error, setError] = useState<string | null>(null); // Estado para manejar errores
+  const nodeTypes = useMemo(() => ({
+    custom: CustomNode,
+  }), []);
+
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     try {
-      if (content) {
+      const syntaxError = isValidSyntax(content);
+      console.log(content)
+      if (content && !syntaxError) {
         const parsed = parseToReactFlow(content) as { nodes: Node[]; edges: Edge[] };
-        const positionedNodes = applyLayout(parsed.nodes, parsed.edges, layout);
+        const nodesWithTypes = parsed.nodes.map(node => ({
+          ...node,
+          type: 'custom',
+        }));
+        const positionedNodes = applyLayout(nodesWithTypes, parsed.edges, layout);
+
         setNodes(positionedNodes);
 
         const styledEdges = parsed.edges.map((edge) => ({
@@ -51,14 +77,17 @@ export default function Visualization({ content, layout, useCurvedEdges }: Props
           // Eliminamos markerEnd para quitar las flechas
         }));
         setEdges(styledEdges);
+        setError(null); // Limpia el error si todo está bien
       } else {
         setNodes([]);
         setEdges([]);
+        setError(syntaxError || 'El contenido tiene una sintaxis inválida.'); // Establece un mensaje de error
       }
     } catch (error) {
       console.error('Error al parsear contenido:', error);
       setNodes([]);
       setEdges([]);
+      setError('Error al parsear contenido. Verifica la sintaxis.'); // Establece un mensaje de error
     }
   }, [content, layout, useCurvedEdges]);
 
@@ -164,6 +193,10 @@ export default function Visualization({ content, layout, useCurvedEdges }: Props
   };
 
   return (
+
+    <div style={{ width: '100vw', height: '100vh', overflow: 'auto' }}>
+      {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>} {/* Muestra el error */}
+
     <div
       className="visualization-wrapper"
       style={{
@@ -192,6 +225,7 @@ export default function Visualization({ content, layout, useCurvedEdges }: Props
         <FontAwesomeIcon icon={faDownload} />
       </button>
 
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -199,6 +233,7 @@ export default function Visualization({ content, layout, useCurvedEdges }: Props
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         fitView
+        nodeTypes={nodeTypes}
         style={{ backgroundColor: 'white' }}
       >
         <Controls className="react-flow__controls" />
